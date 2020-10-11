@@ -4,14 +4,14 @@
   "version": "${version}",
 
   "name": "Erroring Entity Remover",
-  "description": "Removes entities that throw errors while ticking.",
+  "description": "Removes entities that throw errors and crash the game while ticking.",
   "authors": [
     "The_Fireplace"
   ],
   "contact": {
-    "homepage": "",
-    "sources": "",
-    "issues": ""
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/erroring-entity-remover",
+    "sources": "https://github.com/The-Fireplace-Minecraft-Mods/Erroring-Entity-Remover",
+    "issues": "https://github.com/The-Fireplace-Minecraft-Mods/Erroring-Entity-Remover/issues"
   },
 
   "license": "GPL-3.0-or-later",

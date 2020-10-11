@@ -28,7 +28,7 @@ public abstract class WorldMixin {
             tickConsumer.accept(entity);
         } catch (Throwable throwable) {
             try {
-                LOGGER.warn("Removing erroring entity:");
+                LOGGER.warn("Removing erroring entity at {} :", entity.getPos().toString());
                 LOGGER.warn(entity.toTag(new CompoundTag()).toString());
                 entity.remove();
                 LOGGER.error("Erroring Entity Stacktrace:", throwable);
