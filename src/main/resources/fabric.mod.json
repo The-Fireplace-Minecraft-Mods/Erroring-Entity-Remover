@@ -14,7 +14,7 @@
     "issues": "https://github.com/The-Fireplace-Minecraft-Mods/Erroring-Entity-Remover/issues"
   },
 
-  "license": "GPL-3.0-or-later",
+  "license": "MIT",
 
   "environment": "*",
   "entrypoints": {

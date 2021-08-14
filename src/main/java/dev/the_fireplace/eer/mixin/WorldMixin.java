@@ -1,5 +1,4 @@
-package the_fireplace.eer.mixin;
-
+package dev.the_fireplace.eer.mixin;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.CompoundTag;
