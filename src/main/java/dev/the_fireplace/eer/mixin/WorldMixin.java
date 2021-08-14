@@ -1,7 +1,7 @@
 package dev.the_fireplace.eer.mixin;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
 import net.minecraft.util.crash.CrashReportSection;
@@ -28,8 +28,8 @@ public abstract class WorldMixin {
         } catch (Throwable throwable) {
             try {
                 LOGGER.warn("Removing erroring entity at {} :", entity.getPos().toString());
-                LOGGER.warn(entity.toTag(new CompoundTag()).toString());
-                entity.remove();
+                LOGGER.warn(entity.writeNbt(new NbtCompound()).toString());
+                entity.remove(Entity.RemovalReason.DISCARDED);
                 LOGGER.error("Erroring Entity Stacktrace:", throwable);
             } catch(Exception e) {
                 CrashReport crashReport = CrashReport.create(throwable, "Ticking entity");
