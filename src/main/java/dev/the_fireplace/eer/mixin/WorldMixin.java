@@ -19,7 +19,7 @@ public abstract class WorldMixin {
 
     /**
      * @author The_Fireplace
-     * Attempt to fix erroring entities crashing the game
+     * @reason Avoid letting erroring entities crash the game if possible
      */
     @Overwrite
     public void tickEntity(Consumer<Entity> tickConsumer, Entity entity) {
