@@ -23,7 +23,7 @@ public abstract class WorldMixin {
      * @reason Avoid letting erroring entities crash the game if possible
      */
     @Overwrite
-    public void tickEntity(Consumer<Entity> tickConsumer, Entity entity) {
+    public void guardEntityTick(Consumer<Entity> tickConsumer, Entity entity) {
         try {
             tickConsumer.accept(entity);
         } catch (Throwable throwable) {
@@ -32,7 +32,7 @@ public abstract class WorldMixin {
                 LOGGER.warn(entity.saveWithoutId(new CompoundTag()).toString());
                 entity.remove(Entity.RemovalReason.DISCARDED);
                 LOGGER.error("Erroring Entity Stacktrace:", throwable);
-            } catch(Exception e) {
+            } catch (Exception e) {
                 CrashReport crashReport = CrashReport.forThrowable(throwable, "Ticking entity");
                 CrashReportCategory crashReportSection = crashReport.addCategory("Entity being ticked");
                 entity.fillCrashReportCategory(crashReportSection);
