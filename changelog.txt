@@ -1,1 +1,1 @@
-Update minimum Fabric Loader version to 0.12
+Add entity type to the error log when removing an entity
