@@ -14,14 +14,19 @@ plugins {
 sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
 
-archivesBaseName = project.archives_base_name
+archivesBaseName = "${archives_base_name}-Fabric"
 version = "${project.mod_version}+${project.minecraft_version}"
 group = project.maven_group
+if (project.hasProperty('SNAPSHOT')) {
+	version = "${version}-SNAPSHOT"
+}
+def mainArtifactFile = new File(new File(buildDir, 'libs'), "$archivesBaseName-${version}.jar")
+def changelogFile = file('changelog.txt')
 
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	mappings loom.officialMojangMappings()
+	modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
 
 	compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
 }
@@ -29,8 +34,14 @@ dependencies {
 processResources {
 	inputs.property 'version', project.version
 
-	filesMatching('fabric.mod.json') {
-		expand 'version': project.version
+	def buildProps = project.properties.clone()
+
+	filesMatching('*.mixins.json') {
+		expand "refmap_target": "${archivesBaseName}-"
+	}
+
+	filesMatching(['**/*.json', 'pack.mcmeta']) {
+		expand buildProps
 	}
 }
 
@@ -57,12 +68,13 @@ if (hasProperty('curseForgeApiKey')) {
 		apiKey = curseForgeApiKey
 		project {
 			id = '412568'
-			changelog = file('changelog.txt')
+			changelog = changelogFile
 			releaseType = project.release_type
 			addGameVersion project.minecraft_version
 			addGameVersion 'Java 17'
 			addGameVersion 'Fabric'
-			mainArtifact(new File(new File(buildDir, 'libs'), "$archivesBaseName-${version}.jar")) {
+			addGameVersion 'Quilt'
+			mainArtifact(mainArtifactFile) {
 				displayName = "$archivesBaseName-$version"
 			}
 		}
@@ -80,34 +92,38 @@ if (hasProperty('modrinthApiKey')) {
 		projectId = '9q1j6H6P'
 		versionNumber = version
 		versionName = project.mod_version
-		uploadFile = new File(new File(buildDir, 'libs'), "$archivesBaseName-${version}.jar")
-		changelog = file('changelog.txt').getText()
+		uploadFile = mainArtifactFile
+		changelog = changelogFile.getText()
 		releaseType = project.release_type
 		addGameVersion(project.minecraft_version as String)
 		addLoader('fabric')
+		addLoader('quilt')
 	}
 }
 
-if (hasProperty('nexusUsername')) {
+if (hasProperty('nexusUsername') || System.getenv("NEXUS_USERNAME") != null) {
 	publishing {
 		publications {
 			mavenJava(MavenPublication) {
 				from components.java
+				groupId project.maven_group
+				artifactId project.archivesBaseName
+				version project.version
 				pom {
-					name = 'Erroring Entity Remover'
+					name = project.readable_name
 					packaging = 'jar'
-					description = 'Removes entities that throw errors and crash Minecraft while ticking.'
-					url = 'https://www.curseforge.com/minecraft/mc-mods/erroring-entity-remover'
+					description = project.maven_description
+					url = project.modrinth_url
 					scm {
-						connection = "scm:svn:https://github.com/The-Fireplace-Minecraft-Mods/${project.github_slug}.git"
-						developerConnection = "scm:svn:https://github.com/The-Fireplace-Minecraft-Mods/${project.github_slug}.git"
-						url = "https://github.com/The-Fireplace-Minecraft-Mods/${project.github_slug}"
+						connection = "scm:svn:${project.github_url}.git"
+						developerConnection = "scm:svn:${project.github_url}.git"
+						url = project.github_url
 					}
 
 					licenses {
 						license {
-							name = 'The MIT License'
-							url = 'https://opensource.org/licenses/MIT'
+							name = project.license_name
+							url = project.license_url
 						}
 					}
 
@@ -115,7 +131,7 @@ if (hasProperty('nexusUsername')) {
 						developer {
 							id = 'the_fireplace'
 							name = 'The_Fireplace'
-							email = 'the.f1repl4ce@gmail.com'
+							email = 'git@the-fireplace.dev'
 						}
 					}
 				}
@@ -127,8 +143,8 @@ if (hasProperty('nexusUsername')) {
 				def snapshotsRepoUrl = 'https://oss.sonatype.org/content/repositories/snapshots/'
 				url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
 				credentials {
-					username = nexusUsername
-					password = nexusPassword
+					username = findProperty('nexusUsername') ?: System.getenv("NEXUS_USERNAME")
+					password = findProperty('nexusPassword') ?: System.getenv("NEXUS_PASSWORD")
 				}
 			}
 		}
